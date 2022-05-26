@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+    powerdns:
+        build: .
+        ports:
+            - 53:53/udp
+            - 53:53/tcp
+            - 8081:8081
+        environment:
+            - PDNS_LOG_LEVEL=0
+            - PDNS_API_KEY=${PDNS_API_KEY}
+            - PDNS_WEBSERVER_PASSWORD=${PDNS_WEBSERVER_PASSWORD}
+            - PDNS_WEBSERVER_ALLOWED_FROM=127.0.0.1,::1,172.0.0.0/8
+        volumes: 
+            - ./pdns/:/pdns/
+    dnsadmin:
+        image: ngoduykhanh/powerdns-admin:latest
+        environment: 
+            - SQLALCHEMY_DATABASE_URI=sqlite:////pdns/pdns_db.sqlite
+            - GUINCORN_TIMEOUT=60
+            - SECRET_KEY=${PADM_SECRET_KEY}
+            - GUNICORN_WORKERS=2
+            - GUNICORN_LOGLEVEL=DEBUG
+        volumes: 
+            - ./pdns/:/pdns/
+        ports: 
+            - 8082:80
+        logging:
+            driver: json-file
+            options:
+              max-size: 10m
