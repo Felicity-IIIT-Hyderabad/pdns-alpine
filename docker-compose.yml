@@ -10,12 +10,13 @@ services:
         environment:
             - PDNS_LOG_LEVEL=0
             - PDNS_API_KEY=${PDNS_API_KEY}
-            - PDNS_WEBSERVER_PASSWORD=${PDNS_WEBSERVER_PASSWORD}
             - PDNS_WEBSERVER_ALLOWED_FROM=127.0.0.1,::1,172.0.0.0/8
         volumes: 
             - ./pdns/:/pdns/
     dnsadmin:
         image: ngoduykhanh/powerdns-admin:latest
+        links:
+            - "powerdns:powerdns"
         environment: 
             - SQLALCHEMY_DATABASE_URI=sqlite:////pdns/pdns_db.sqlite
             - GUINCORN_TIMEOUT=60
