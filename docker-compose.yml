@@ -1,12 +1,10 @@
-version: '3'
-
 services:
     powerdns:
         build: .
         ports:
             - 53:53/udp
             - 53:53/tcp
-            - 8081:8081
+            - 127.0.0.1:8081:8081
         environment:
             - PDNS_LOG_LEVEL=0
             - PDNS_API_KEY=${PDNS_API_KEY}
@@ -14,7 +12,7 @@ services:
         volumes: 
             - ./pdns/:/pdns/
     dnsadmin:
-        image: ngoduykhanh/powerdns-admin:latest
+        image: powerdnsadmin/pda-legacy:latest
         links:
             - "powerdns:powerdns"
         environment: 
@@ -22,11 +20,11 @@ services:
             - GUINCORN_TIMEOUT=60
             - SECRET_KEY=${PADM_SECRET_KEY}
             - GUNICORN_WORKERS=2
-            - GUNICORN_LOGLEVEL=DEBUG
+            - GUNICORN_LOGLEVEL=INFO
         volumes: 
             - ./pdns/:/pdns/
         ports: 
-            - 8082:80
+            - 127.0.0.1:8080:80
         logging:
             driver: json-file
             options:
